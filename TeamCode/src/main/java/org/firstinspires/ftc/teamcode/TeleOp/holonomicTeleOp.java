@@ -94,7 +94,7 @@ public class holonomicTeleOp extends OpMode {
 
         if (gamepad2.x) {
             servos.setClawPosition(1);
-        } else if (gamepad1.a) {
+        } else if (gamepad2.a) {
             servos.setClawPosition(1);
         } else {
             servos.setClawPosition(0);
