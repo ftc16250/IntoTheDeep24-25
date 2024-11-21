@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.Hardware.holonomicHardware;
 @TeleOp
 public class holonomicTeleOp extends OpMode {
     holonomicHardware drive = new holonomicHardware();
-    armHardware arm = new armHardware();
+    armHardware motorArm = new armHardware();
     servoHardware servos = new servoHardware();
     double baseSpeed = 1; // This is the multiplier for the movement speed of the base
 
@@ -24,8 +24,8 @@ public class holonomicTeleOp extends OpMode {
                 DcMotorSimple.Direction.FORWARD,
                 DcMotorSimple.Direction.FORWARD
         );
-        arm.init(hardwareMap);
-        arm.setMotorDirection(
+        motorArm.init(hardwareMap);
+        motorArm.setMotorDirection(
                 DcMotorSimple.Direction.FORWARD);
         servos.init(hardwareMap);
 
@@ -84,28 +84,30 @@ public class holonomicTeleOp extends OpMode {
 //endregion
 
 //region Arm Movement
+        /*
         if (gamepad2.left_stick_y > 0) {
-            arm.setMotorPower(1);
+            motorArm.setMotorPower(-1);
         } else if (gamepad2.left_stick_y < 0) {
-            arm.setMotorPower(1);
+            motorArm.setMotorPower(-0.5);
         } else {
-            arm.setMotorPower(0);
+            motorArm.setMotorPower(0);
         }
+*/
+        motorArm.setMotorPower(-gamepad2.left_stick_y/3);
 
-        if (gamepad2.x) {
-            servos.setClawPosition(1);
-        } else if (gamepad2.a) {
-            servos.setClawPosition(1);
-        } else {
-            servos.setClawPosition(0);
-        }
 
         // -----Servo-----
 
         if (gamepad2.right_stick_y > 0) {
-            servos.setArmPosition(1);
+            servos.setArmAngle(90);
         } else if (gamepad2.right_stick_y < 0) {
-            servos.setArmPosition(1);
+            servos.setArmAngle(0);
+        }
+
+        if (gamepad2.x) {
+            servos.setClawAngle(180);
+        } else {
+            servos.setClawAngle(-180);
         }
 //endregion
     }

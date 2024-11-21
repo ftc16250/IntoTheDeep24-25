@@ -10,15 +10,27 @@ public class servoHardware {
         clawServo = hardwareMap.get(Servo.class, "ClawServo");
         armServo = hardwareMap.get(Servo.class, "ArmServo");
     }
-    public void setClawPosition(double position) {
-        clawServo.setDirection(Servo.Direction.REVERSE);
-
+    public void setClawAngle(int angle) {
+        clawServo.setDirection(Servo.Direction.FORWARD);
+        angle += 180;
+        double position = (double) (1/360) * angle;
         clawServo.setPosition(position);
     }
 
-    public void setArmPosition(double position) {
-        armServo.setDirection(Servo.Direction.REVERSE);
-
+    public void setArmAngle(int angle) {
+        armServo.setDirection(Servo.Direction.FORWARD);
+        angle += 180;
+        double position = (double) (1/360) * angle;
         armServo.setPosition(position);
+    }
+
+    public int getClawAngle(){
+        double receivedPosition = clawServo.getPosition();
+        double newAngle = (1/360) * receivedPosition;
+        return (int)newAngle;
+    }
+
+    public  void addClawAngle(int angle){
+        setClawAngle(getClawAngle()+angle);
     }
 }
