@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.Hardware;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.opencv.core.Mat;
+
 public class servoHardware {
     public Servo clawServo;
     public Servo armServo;
@@ -10,24 +12,38 @@ public class servoHardware {
         clawServo = hardwareMap.get(Servo.class, "ClawServo");
         armServo = hardwareMap.get(Servo.class, "ArmServo");
     }
+
+    public static double mapValue(double value) {
+        double oldMin = 0.0;
+        double oldMax = 1.0;
+        double newMin = -180.0;
+        double newMax = 180.0;
+
+        return (value - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
+    }
+
+    // Inverse: Map from [-180, 180] back to [0, 1]
+    public static int inverseMapValue(double value) {
+        double oldMin = -180.0;
+        double oldMax = 180.0;
+        double newMin = 0.0;
+        double newMax = 1.0;
+        double rawReturnValue = (value - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
+        return (int)Math.round(rawReturnValue);
+    }
     public void setClawAngle(int angle) {
         clawServo.setDirection(Servo.Direction.FORWARD);
-        angle += 180;
-        double position = (double) (1/360) * angle;
-        clawServo.setPosition(position);
+        clawServo.setPosition(mapValue(angle));
     }
 
     public void setArmAngle(int angle) {
         armServo.setDirection(Servo.Direction.FORWARD);
-        angle += 180;
-        double position = (double) (1/360) * angle;
-        armServo.setPosition(position);
+        armServo.setPosition(mapValue(angle));
     }
 
     public int getClawAngle(){
         double receivedPosition = clawServo.getPosition();
-        double newAngle = (1/360) * receivedPosition;
-        return (int)newAngle;
+        return inverseMapValue(receivedPosition);
     }
 
     public  void addClawAngle(int angle){
