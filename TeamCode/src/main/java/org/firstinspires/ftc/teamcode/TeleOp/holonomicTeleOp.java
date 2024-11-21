@@ -99,7 +99,7 @@ public class holonomicTeleOp extends OpMode {
         // -----Servo-----
 
         if (gamepad2.right_stick_y > 0) {
-            servos.setArmAngle(91);
+            servos.setArmAngle(90);
         } else if (gamepad2.right_stick_y < 0) {
             servos.setArmAngle(0);
         }
