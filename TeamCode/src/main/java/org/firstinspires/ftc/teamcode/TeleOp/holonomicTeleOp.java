@@ -32,7 +32,7 @@ public class holonomicTeleOp extends OpMode {
 
     }
 
-    protected void MoveBase(int fl, int fr, int bl, int br) {
+    protected void MoveBase(double fl, double fr, double bl, double br) {
 
         drive.setMotorPower(fl * baseSpeed, fr * baseSpeed, bl * baseSpeed, br * baseSpeed);
     }
@@ -51,63 +51,60 @@ public class holonomicTeleOp extends OpMode {
 
         // region Base Movement
         if (gamepad1.left_stick_y > 0) {
-
-            MoveBase(-1, 1, -1, 1);
+            double fowardSpeed = gamepad1.left_stick_y;
+            MoveBase(-fowardSpeed, fowardSpeed, -fowardSpeed, fowardSpeed);
         }
         if (gamepad1.left_stick_y < 0) {
             // check what happens when you set negative power
-            MoveBase(1, -1, 1, -1);
+            double backSpeed = gamepad1.left_stick_y;
+            MoveBase(-backSpeed, backSpeed, -backSpeed, backSpeed);
+        }
+        if (gamepad1.right_stick_x < 0) {
+            double strafeLeftSpeed = gamepad1.left_stick_x;
+            MoveBase(-strafeLeftSpeed, -strafeLeftSpeed, strafeLeftSpeed, strafeLeftSpeed);
         }
         if (gamepad1.right_stick_x > 0) {
 
-            MoveBase(1, 1, -1, -1);
+            double strafeRightSpeed = gamepad1.left_stick_x;
+            MoveBase(-strafeRightSpeed, -strafeRightSpeed, strafeRightSpeed, strafeRightSpeed);
         }
-        if (gamepad1.right_stick_x < 0) {
-
-            MoveBase(-1, -1, 1, 1);
-        }
-        if (gamepad1.right_bumper) {
+       /* if (gamepad1.right_bumper) {
 
             MoveBase(-1, -1, -1, -1);
         }
         if (gamepad1.left_bumper) {
 
             MoveBase(1, 1, 1, 1);
+        }*/
+        if(gamepad1.right_stick_x != 0) {
+            double spinSpeed = gamepad1.right_stick_x;
+            MoveBase(-spinSpeed, -spinSpeed, -spinSpeed, -spinSpeed);
         }
-
         // don't spin motor if nothing is pressed
-        else MoveBase(0, 0, 0, 0);
-        telemetry.addData("Ticks Per Rotation FrontLeft", drive.getMotorRotationsFl());
-        telemetry.addData("Ticks Per Rotation Front Right", drive.getMotorRotationsFr());
-        telemetry.addData("Ticks Per Rotation Back Left", drive.getMotorRotationsBl());
-        telemetry.addData("Ticks Per Rotation Back Right", drive.getMotorRotationsBr());
+        else {  MoveBase(0, 0, 0, 0);}
+       // telemetry.addData("Ticks Per Rotation FrontLeft", drive.getMotorRotationsFl());
+        //telemetry.addData("Ticks Per Rotation Front Right", drive.getMotorRotationsFr());
+        //telemetry.addData("Ticks Per Rotation Back Left", drive.getMotorRotationsBl());
+        ///telemetry.addData("Ticks Per Rotation Back Right", drive.getMotorRotationsBr());
 //endregion
 
 //region Arm Movement
-        /*
-        if (gamepad2.left_stick_y > 0) {
-            motorArm.setMotorPower(-1);
-        } else if (gamepad2.left_stick_y < 0) {
-            motorArm.setMotorPower(-0.5);
-        } else {
-            motorArm.setMotorPower(0);
-        }
-*/
-        motorArm.setMotorPower(-gamepad2.left_stick_y/3);
+
+        motorArm.setMotorPower(gamepad2.left_stick_y/3);
 
 
         // -----Servo-----
 
-        if (gamepad2.right_stick_y > 0) {
-            servos.setArmAngle(90);
-        } else if (gamepad2.right_stick_y < 0) {
+        if (gamepad2.right_trigger>0) {
+            servos.setArmAngle(1);
+        } else if (gamepad2.left_trigger>0) {
             servos.setArmAngle(0);
         }
 
         if (gamepad2.x) {
-            servos.setClawAngle(180);
+            servos.setClawAngle(0);
         } else {
-            servos.setClawAngle(-180);
+            servos.setClawAngle(1);
         }
 //endregion
     }

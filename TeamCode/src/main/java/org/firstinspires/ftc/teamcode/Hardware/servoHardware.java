@@ -13,7 +13,7 @@ public class servoHardware {
         armServo = hardwareMap.get(Servo.class, "ArmServo");
     }
 
-    public static double mapValue(double value) {
+    public double mapValue(double value) {
         double oldMin = 0.0;
         double oldMax = 1.0;
         double newMin = -180.0;
@@ -31,14 +31,15 @@ public class servoHardware {
         double rawReturnValue = (value - oldMin) * (newMax - newMin) / (oldMax - oldMin) + newMin;
         return (int)Math.round(rawReturnValue);
     }
-    public void setClawAngle(int angle) {
+    public void setClawAngle(double angle) {
         clawServo.setDirection(Servo.Direction.FORWARD);
-        clawServo.setPosition(mapValue(angle));
+        clawServo.setPosition(angle);
+
     }
 
-    public void setArmAngle(int angle) {
+    public void setArmAngle(double angle) {
         armServo.setDirection(Servo.Direction.FORWARD);
-        armServo.setPosition(mapValue(angle));
+        armServo.setPosition(angle);
     }
 
     public int getClawAngle(){
