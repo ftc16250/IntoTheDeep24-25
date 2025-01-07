@@ -10,7 +10,7 @@ public class servoHardware {
     public void init(HardwareMap hardwareMap) {
 
         clawServo = hardwareMap.get(Servo.class, "ClawServo");
-        armServo = hardwareMap.get(Servo.class, "ArmServo");
+        armServo = hardwareMap.get(Servo.class, "ArmServo"); // Possible Issue
     }
 
     public double mapValue(double value) {
@@ -42,12 +42,21 @@ public class servoHardware {
         armServo.setPosition(angle);
     }
 
-    public int getClawAngle(){
-        double receivedPosition = clawServo.getPosition();
-        return inverseMapValue(receivedPosition);
+    public double getClawAngle(){
+        //double receivedPosition = clawServo.getPosition();
+        //return inverseMapValue(receivedPosition);
+        return clawServo.getPosition();
     }
 
-    public  void addClawAngle(int angle){
+    public double getArmAngle(){
+        return armServo.getPosition();
+    }
+
+    public  void addClawAngle(double angle){
+        //if(angle < 0 && getArmAngle() == )
         setClawAngle(getClawAngle()+angle);
+    }
+    public  void addArmAngle(double angle){
+        setArmAngle(getArmAngle()+angle);
     }
 }

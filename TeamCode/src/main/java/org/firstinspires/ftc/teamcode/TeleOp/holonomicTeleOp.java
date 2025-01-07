@@ -8,13 +8,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Hardware.armHardware;
 import org.firstinspires.ftc.teamcode.Hardware.servoHardware;
 import org.firstinspires.ftc.teamcode.Hardware.holonomicHardware;
+
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @TeleOp
 public class holonomicTeleOp extends OpMode {
     holonomicHardware drive = new holonomicHardware();
     armHardware motorArm = new armHardware();
     servoHardware servos = new servoHardware();
+    double linearSlideStaticPower = 0;
     double baseSpeed = 1; // This is the multiplier for the movement speed of the base
-
+    static final double armSpeed = 1 ; // This will not be changed in game
+    SparkFunOTOS sparkfunOTOS;
     @Override
     public void init() {
         drive.init(hardwareMap);
@@ -29,21 +35,40 @@ public class holonomicTeleOp extends OpMode {
                 DcMotorSimple.Direction.FORWARD);
         servos.init(hardwareMap);
 
-
+        servos.armServo.setPosition(0);
+        sparkfunOTOS = hardwareMap.get(SparkFunOTOS.class, "otos");
+        configureOTOS();
     }
 
     protected void MoveBase(double fl, double fr, double bl, double br) {
 
         drive.setMotorPower(fl * baseSpeed, fr * baseSpeed, bl * baseSpeed, br * baseSpeed);
     }
+    private void configureOTOS() {
+        sparkfunOTOS.setLinearUnit(DistanceUnit.INCH);
+        sparkfunOTOS.setAngularUnit(AngleUnit.DEGREES);
+        sparkfunOTOS.setOffset(new SparkFunOTOS.Pose2D(0, 0, 0));
+        sparkfunOTOS.setLinearScalar(1.0);
+        sparkfunOTOS.setAngularScalar(1.0);
+        sparkfunOTOS.resetTracking();
+        sparkfunOTOS.setPosition(new SparkFunOTOS.Pose2D(0,0,0));
+        sparkfunOTOS.calibrateImu(255, false);
+    }
 
     @Override
     public void loop() {
+        SparkFunOTOS.Pose2D pos = sparkfunOTOS.getPosition();
+        telemetry.addData("X (inch)", pos.x);
+        telemetry.addData("Y (inch)", pos.y);
+        telemetry.addData("Heading (degrees)", pos.h);
 
         //region Set Base Speed
-        if (gamepad1.b) {
-            baseSpeed = 0.5;
-        } else {
+        if (gamepad1.left_trigger > 0) {
+            baseSpeed = 1-gamepad1.left_trigger;
+        }else if(gamepad1.right_trigger > 0)
+        {
+            baseSpeed =gamepad1.right_trigger+1;
+        }else{
             baseSpeed = 1;
         }
         //endregion
@@ -59,14 +84,16 @@ public class holonomicTeleOp extends OpMode {
             double backSpeed = gamepad1.left_stick_y;
             MoveBase(-backSpeed, backSpeed, -backSpeed, backSpeed);
         }
-        if (gamepad1.right_stick_x < 0) {
+        if (gamepad1.left_stick_x < 0) {
             double strafeLeftSpeed = gamepad1.left_stick_x;
             MoveBase(-strafeLeftSpeed, -strafeLeftSpeed, strafeLeftSpeed, strafeLeftSpeed);
+            telemetry.addData("strafe", "left");
         }
-        if (gamepad1.right_stick_x > 0) {
+        if (gamepad1.left_stick_x > 0) {
 
             double strafeRightSpeed = gamepad1.left_stick_x;
             MoveBase(-strafeRightSpeed, -strafeRightSpeed, strafeRightSpeed, strafeRightSpeed);
+            telemetry.addData("strafe", "right");
         }
        /* if (gamepad1.right_bumper) {
 
@@ -89,22 +116,29 @@ public class holonomicTeleOp extends OpMode {
 //endregion
 
 //region Arm Movement
+        if(gamepad2.left_stick_y != 0){
+            motorArm.setMotorPower(gamepad2.left_stick_y/3);
 
-        motorArm.setMotorPower(gamepad2.left_stick_y/3);
+        }else {
 
-
-        // -----Servo-----
-
-        if (gamepad2.right_trigger>0) {
-            servos.setArmAngle(1);
-        } else if (gamepad2.left_trigger>0) {
-            servos.setArmAngle(0);
+            motorArm.setMotorPower(0);
         }
 
+
+        // -----Arm-----
+        /*if(gamepad2.right_trigger > 0 ){
+            servos.addArmAngle(armSpeed);
+            telemetry.addData("balls", "2");
+        }else if(gamepad2.left_trigger > 0){
+            servos.addArmAngle(-armSpeed);
+        }*/
+
+        servos.setArmAngle(gamepad2.right_trigger);
+        // -----Claw-----
         if (gamepad2.x) {
-            servos.setClawAngle(0);
+            servos.setClawAngle(0.3);
         } else {
-            servos.setClawAngle(1);
+            servos.setClawAngle(1 );
         }
 //endregion
     }
