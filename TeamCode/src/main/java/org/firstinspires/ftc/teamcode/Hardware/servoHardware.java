@@ -7,6 +7,7 @@ import org.opencv.core.Mat;
 public class servoHardware {
     public Servo clawServo;
     public Servo armServo;
+    private float armAngleLimiter = 0.7f;
     public void init(HardwareMap hardwareMap) {
 
         clawServo = hardwareMap.get(Servo.class, "ClawServo");
@@ -39,6 +40,10 @@ public class servoHardware {
 
     public void setArmAngle(double angle) {
         armServo.setDirection(Servo.Direction.FORWARD);
+        if(angle > armAngleLimiter)
+        {
+            armServo.setPosition(armAngleLimiter);
+        }
         armServo.setPosition(angle);
     }
 

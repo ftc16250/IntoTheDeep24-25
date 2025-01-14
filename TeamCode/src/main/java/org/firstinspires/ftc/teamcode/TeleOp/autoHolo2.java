@@ -30,12 +30,8 @@ public class autoHolo2 extends OpMode{
                 DcMotorSimple.Direction.FORWARD
         );
         arms.init(hardwareMap);
-        arms.setMotorArmDirection(
-                DcMotorSimple.Direction.FORWARD);
-        arms.setMotorDDPDirection(
-                DcMotorSimple.Direction.FORWARD);
-        arms.setMotorDDP2Direction(
-                DcMotorSimple.Direction.FORWARD);
+        arms.setLinearSlideMotorDirection(DcMotorSimple.Direction.FORWARD);
+        arms.setArmMotorsDirection(holonomic2TeleOp.Side.Both, DcMotorSimple.Direction.FORWARD);
         servo.init(hardwareMap);
 
         servo.setPosition(0);
@@ -62,12 +58,12 @@ public class autoHolo2 extends OpMode{
         telemetry.addData("Y (inch)", pos.y);
         telemetry.addData("Heading (degrees)", pos.h);
 
-        drive.setMotorPower(1,-1,1,-1);
+        /*drive.setMotorPower(1,-1,1,-1);
         if (pos.y>= 48){
             drive.setMotorPower(0,0,0,0);
             arms.setMotorDDPPower(1);
             arms.setMotorDDP2Power(1);
-        }
+        }*/
 
     }
 }

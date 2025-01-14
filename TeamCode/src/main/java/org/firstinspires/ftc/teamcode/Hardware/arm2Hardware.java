@@ -4,72 +4,120 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.TeleOp.holonomic2TeleOp;
+
 public class arm2Hardware {
-    private DcMotor motorArm;
-    private double ticksPerRotationArm;
-    private DcMotor motorDDP;
-    private double ticksPerRotationDDP;
-    private DcMotor motorDDP2;
-    private double ticksPerRotationDDP2;
 
+    // region Variables
+    private DcMotor linearSlideMotor; // Linear slide motor
+    private DcMotor armMotorLeft;
+    private DcMotor armMotorRight;
+
+    private double ticksPerRotationLinearSlide;
+    private double ticksPerRotationLeft; // Ticks Per Rotation for the Right Motor Arm
+    private double ticksPerRotationRight; // Ticks Per Rotation for the Right Motor Arm
+    private holonomic2TeleOp _holonomic2TeleOp;
+
+    public enum Side {
+        Left,
+        Right,
+        Both,
+        None
+    }
+// endregion
     public void init(HardwareMap hardwareMap) {
-        motorArm = hardwareMap.dcMotor.get("motorArm");
-        ticksPerRotationArm = motorArm.getMotorType().getTicksPerRev();
-        motorArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        motorDDP = hardwareMap.dcMotor.get("DDP1");
-        ticksPerRotationDDP = motorDDP.getMotorType().getTicksPerRev();
-        motorDDP.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // Linear Slide Motor
+        linearSlideMotor = hardwareMap.dcMotor.get("LinearSlideMotor");
+        ticksPerRotationLinearSlide = linearSlideMotor.getMotorType().getTicksPerRev();
+        linearSlideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        motorDDP2 = hardwareMap.dcMotor.get("DDP1");
-        ticksPerRotationDDP2 = motorDDP.getMotorType().getTicksPerRev();
-        motorDDP2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        // Left Arm Motor
+        armMotorLeft = hardwareMap.dcMotor.get("ArmMotorLeft");
+        ticksPerRotationLeft = armMotorLeft.getMotorType().getTicksPerRev();
+        armMotorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        // Right Arm Motor
+        armMotorRight = hardwareMap.dcMotor.get("ArmMotorRight");
+        ticksPerRotationRight = armMotorRight.getMotorType().getTicksPerRev();
+        armMotorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void setMotorArmDirection(DcMotorSimple.Direction direction) {
-        motorArm.setDirection(direction);
+    // region Linear Slide Functions
+    public void setLinearSlideMotorDirection(DcMotorSimple.Direction direction) {
+        linearSlideMotor.setDirection(direction);
     }
 
-    public void setMotorArmPower(double power) {
-        motorArm.setPower(power);
+    public void setLinearSlideMotorPower(double power) {
+        linearSlideMotor.setPower(power);
     }
 
-    public double getMotorArmPower() {
-        return motorArm.getPower(); // Retrieves the current power of the motorArm
+    public double getLinearSlideMotorPower() {
+        return linearSlideMotor.getPower(); // Retrieves the current power of the motorArm
     }
 
-    public double getMotorArmRotations() {
-        return motorArm.getCurrentPosition() / ticksPerRotationArm;
+    public double getTicksPerRotationLinearSlide() {
+
+        return linearSlideMotor.getCurrentPosition() / ticksPerRotationLinearSlide;
+    }
+// endregion
+
+    // region Arm Motors Functions
+
+    // Set the direction any Arm Motor (can do both at once)
+    public void setArmMotorsDirection(holonomic2TeleOp.Side side, DcMotorSimple.Direction direction) {
+        switch (side) {
+            case Both:
+                armMotorLeft.setDirection(direction);
+                armMotorRight.setDirection(direction);
+            case Left:
+                armMotorLeft.setDirection(direction);
+            case Right:
+                armMotorRight.setDirection(direction);
+            default:
+
+        }
+
     }
 
-    public void setMotorDDPDirection(DcMotorSimple.Direction direction) {
-        motorDDP.setDirection(direction);
+    // Set the power of any Arm Motor (can do both at once)
+    public void setArmMotorsPower(holonomic2TeleOp.Side side, double power) {
+        switch (side) {
+            case Left:
+                armMotorLeft.setPower(power);
+            case Right:
+                armMotorRight.setPower(power);
+            case Both:
+                armMotorLeft.setPower(power);
+                armMotorRight.setPower(power);
+        }
     }
 
-    public void setMotorDDPPower(double power) {
-        motorDDP.setPower(power);
+    // Get the power of an Arm Motor
+    public double getArmMotorsPower(holonomic2TeleOp.Side side) {
+        switch (side) {
+            case Left:
+                return armMotorLeft.getPower();
+            case Right:
+                return armMotorRight.getPower();
+            default:
+                return 0; // If no parameter is passed through
+        }
     }
 
-    public double getMotorDDPPower() {
-        return motorDDP.getPower(); // Retrieves the current power of the motorElbow
+    // Get the rotation position an Arm Motor
+    public double getArmMotorsRotations(holonomic2TeleOp.Side side) {
+        switch (side) {
+            case Left:
+                return armMotorLeft.getCurrentPosition() / ticksPerRotationLeft;
+            case Right:
+                return armMotorRight.getCurrentPosition() / ticksPerRotationRight;
+            default:
+                return 0; // If nothing is passed through the parameters
+        }
+
     }
 
-    public double getMotorDDPRotations() {
-        return motorDDP.getCurrentPosition() / ticksPerRotationDDP2;
-    }
-    public void setMotorDDP2Direction(DcMotorSimple.Direction direction) {
-        motorDDP2.setDirection(direction);
-    }
-
-    public void setMotorDDP2Power(double power) {
-        motorDDP2.setPower(power);
-    }
-
-    public double getMotorDDP2Power() {
-        return motorDDP2.getPower(); // Retrieves the current power of the motorElbow
-    }
-
-    public double getMotorDDP2Rotations() {
-        return motorDDP2.getCurrentPosition() / ticksPerRotationDDP2;
-    }
+    // endregion
 }
