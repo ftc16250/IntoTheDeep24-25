@@ -28,7 +28,7 @@ public class holonomic2TeleOp extends OpMode {
     // region Values
     double linearSlideStaticPower = 0;
     double baseSpeed = 1; // This is the multiplier for the movement speed of the base
-    static final double armSpeed = 1; // This will not be changed in-game
+    static final double armSpeed = 0; // This will not be changed in-game
     // endregion
     @Override
     public void init() {
@@ -71,9 +71,9 @@ public class holonomic2TeleOp extends OpMode {
         }
 
         // Base Movement
-        double forwardSpeed = Input.FowardSpeed;
-        double strafeSpeed = Input.StrafeSpeed;
-        double spinSpeed = Input.RotationSpeed;
+        double forwardSpeed = gamepad1.left_stick_y;
+        double strafeSpeed = gamepad1.right_stick_x;
+        double spinSpeed = gamepad1.left_stick_x;
 
         if (forwardSpeed != 0) {
             MoveBase(forwardSpeed, -forwardSpeed, forwardSpeed, -forwardSpeed);
@@ -85,19 +85,36 @@ public class holonomic2TeleOp extends OpMode {
             MoveBase(0, 0, 0, 0);
         }
 
-        // Arm Movement
-        if(Input.LinearSlideAxis > 0){
-            arms.setLinearSlideMotorPower(Input.LinearSlideAxis);
+        // Linear Slide Arm Movement
+        if(gamepad2.left_stick_y > 0){
+            arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
+        } else if (gamepad2.left_stick_y<0) {
+            arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
+        }else {
+            arms.setLinearSlideMotorPower(0);
+        }
+
+        //Motor Arms Movement
+        if(gamepad2.right_stick_x > 0){
+            arms.setArmMotorsPower(Side.Both,gamepad2.right_stick_x);
+        } else if (gamepad2.right_stick_x<0) {
+            arms.setArmMotorsPower(Side.Both,gamepad2.right_stick_x);
+        }else {
+            arms.setArmMotorsPower(Side.Both,0);
         }
 
 
         // Claw Control
-        servo.setPosition(Input.ClawButton ? 0.7 : 0); // 0.7 Open
+        if (gamepad2.x)
+        servo.setPosition(0);
+        else {
+            servo.setPosition(0.7);
+        }// 0.7 Open
 
         // Debugging Telemetry
         telemetry.addData("Base Speed", baseSpeed);
         telemetry.addData("Arm Power", arms.getLinearSlideMotorPower());
-        telemetry.addData("Arm Rotations", arms.getLinearSlideMotorPower());
+        telemetry.addData("Arm Rotations", arms.getArmMotorsRotations(Side.Left));
         telemetry.addData("Claw Position", servo.getPosition());
         telemetry.update();
     }

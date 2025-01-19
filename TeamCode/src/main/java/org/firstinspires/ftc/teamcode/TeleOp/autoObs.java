@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Hardware.arm2Hardware;
@@ -14,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous
-public class autoHolo2 extends OpMode{
+public class autoObs extends OpMode{
     holonomicHardware drive = new holonomicHardware();
     arm2Hardware arms = new arm2Hardware();
     servoHardware2 servo = new servoHardware2();
@@ -58,12 +57,12 @@ public class autoHolo2 extends OpMode{
         telemetry.addData("Y (inch)", pos.y);
         telemetry.addData("Heading (degrees)", pos.h);
 
-        /*drive.setMotorPower(1,-1,1,-1);
+        drive.setMotorPower(1,-1,1,-1);
         if (pos.y>= 48){
             drive.setMotorPower(0,0,0,0);
-            arms.setMotorDDPPower(1);
-            arms.setMotorDDP2Power(1);
-        }*/
+            arms.setArmMotorsPower(holonomic2TeleOp.Side.Both, 1);
+
+        }
 
     }
 }
