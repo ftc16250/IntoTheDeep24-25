@@ -2,8 +2,8 @@ package org.firstinspires.ftc.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Hardware.arm2Hardware;
 import org.firstinspires.ftc.teamcode.Hardware.servoHardware2;
@@ -17,7 +17,8 @@ public class holonomic2TeleOp extends OpMode {
     arm2Hardware arms = new arm2Hardware();
     servoHardware2 servo = new servoHardware2();
     TeleOpInput2 Input = new TeleOpInput2();
-    public enum Side{
+
+    public enum Side {
         Left,
         Right,
         Both,
@@ -26,10 +27,11 @@ public class holonomic2TeleOp extends OpMode {
     // endregion
 
     // region Values
-    double linearSlideStaticPower = 0;
+
     double baseSpeed = 1; // This is the multiplier for the movement speed of the base
-    static final double armSpeed = 0; // This will not be changed in-game
+    static final double maxArmRotation = -372; // Maximum allowed arm rotation
     // endregion
+
     @Override
     public void init() {
         // Initialize drive hardware
@@ -43,7 +45,8 @@ public class holonomic2TeleOp extends OpMode {
 
         // Initialize arm hardware
         arms.init(hardwareMap);
-        arms.setArmMotorsDirection(Side.Both, DcMotorSimple.Direction.FORWARD);
+        arms.setArmMotorsDirection(arm2Hardware.Side.Right, DcMotorSimple.Direction.FORWARD);
+        arms.setArmMotorsDirection(arm2Hardware.Side.Left, DcMotorSimple.Direction.REVERSE);
         arms.setLinearSlideMotorDirection(DcMotorSimple.Direction.FORWARD);
 
         // Initialize servo hardware
@@ -66,7 +69,7 @@ public class holonomic2TeleOp extends OpMode {
         // Base Speed Adjustment
         if (Input.BaseBrakes > 0) {
             baseSpeed = 1 - gamepad1.left_trigger;
-        }else {
+        } else {
             baseSpeed = 1;
         }
 
@@ -86,35 +89,37 @@ public class holonomic2TeleOp extends OpMode {
         }
 
         // Linear Slide Arm Movement
-        if(gamepad2.left_stick_y > 0){
+        if (gamepad2.left_stick_y > 0) {
             arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
-        } else if (gamepad2.left_stick_y<0) {
+        } else if (gamepad2.left_stick_y < 0) {
             arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
-        }else {
+        } else {
             arms.setLinearSlideMotorPower(0);
         }
 
-        //Motor Arms Movement
-        if(gamepad2.right_stick_x > 0){
-            arms.setArmMotorsPower(Side.Both,gamepad2.right_stick_x);
-        } else if (gamepad2.right_stick_x<0) {
-            arms.setArmMotorsPower(Side.Both,gamepad2.right_stick_x);
-        }else {
-            arms.setArmMotorsPower(Side.Both,0);
-        }
+        // Arm Motors Movement with Rotation Limit
+        double leftRotations = arms.getArmMotorsRotations(arm2Hardware.Side.Left);
+        double rightRotations = arms.getArmMotorsRotations(arm2Hardware.Side.Right);
+
+       arms.setArmMotorsPower(arm2Hardware.Side.Right, 0.5);
+        arms.setArmMotorsPower(arm2Hardware.Side.Left, -0.5);
 
 
         // Claw Control
-        if (gamepad2.x)
-        servo.setPosition(0);
-        else {
-            servo.setPosition(0.7);
-        }// 0.7 Open
+        if (gamepad2.x) {
+            servo.setPosition(0); // Closed position
+        } else {
+            servo.setPosition(0.7); // Open position
+        }
 
         // Debugging Telemetry
         telemetry.addData("Base Speed", baseSpeed);
-        telemetry.addData("Arm Power", arms.getLinearSlideMotorPower());
-        telemetry.addData("Arm Rotations", arms.getArmMotorsRotations(Side.Left));
+        telemetry.addData("Linear Slide Power", arms.getLinearSlideMotorPower());
+        telemetry.addData("Linear Slide Rotations", arms.getLinearSlideMotorRotations());
+        telemetry.addData("Left Arm Rotations", leftRotations);
+        telemetry.addData("Right Arm Power", arms.getArmMotorsPower(arm2Hardware.Side.Right));
+        telemetry.addData("Left Arm Power", arms.getArmMotorsPower(arm2Hardware.Side.Left));
+        telemetry.addData("Right Arm Rotations", rightRotations);
         telemetry.addData("Claw Position", servo.getPosition());
         telemetry.update();
     }

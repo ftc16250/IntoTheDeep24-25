@@ -24,13 +24,14 @@ public class autoObs extends OpMode{
         drive.init(hardwareMap);
         drive.setMotorDirection(
                 DcMotorSimple.Direction.FORWARD,
+                DcMotorSimple.Direction.REVERSE,
                 DcMotorSimple.Direction.FORWARD,
-                DcMotorSimple.Direction.FORWARD,
-                DcMotorSimple.Direction.FORWARD
+                DcMotorSimple.Direction.REVERSE
         );
         arms.init(hardwareMap);
-        arms.setLinearSlideMotorDirection(DcMotorSimple.Direction.FORWARD);
-        arms.setArmMotorsDirection(holonomic2TeleOp.Side.Both, DcMotorSimple.Direction.FORWARD);
+        arms.setLinearSlideMotorDirection(DcMotorSimple.Direction.REVERSE);
+        arms.setArmMotorsDirection(arm2Hardware.Side.Right, DcMotorSimple.Direction.FORWARD);
+        arms.setArmMotorsDirection(arm2Hardware.Side.Left, DcMotorSimple.Direction.REVERSE);
         servo.init(hardwareMap);
 
         servo.setPosition(0);
@@ -57,10 +58,10 @@ public class autoObs extends OpMode{
         telemetry.addData("Y (inch)", pos.y);
         telemetry.addData("Heading (degrees)", pos.h);
 
-        drive.setMotorPower(1,-1,1,-1);
+        drive.setMotorPower(1,1,1,1);
         if (pos.y>= 48){
             drive.setMotorPower(0,0,0,0);
-            arms.setArmMotorsPower(holonomic2TeleOp.Side.Both, 1);
+            arms.setArmMotorsPower(arm2Hardware.Side.Both, 1);
 
         }
 
