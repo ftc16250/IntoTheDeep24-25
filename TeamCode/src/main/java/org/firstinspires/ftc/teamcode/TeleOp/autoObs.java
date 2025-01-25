@@ -30,8 +30,7 @@ public class autoObs extends OpMode{
         );
         arms.init(hardwareMap);
         arms.setLinearSlideMotorDirection(DcMotorSimple.Direction.REVERSE);
-        arms.setArmMotorsDirection(arm2Hardware.Side.Right, DcMotorSimple.Direction.FORWARD);
-        arms.setArmMotorsDirection(arm2Hardware.Side.Left, DcMotorSimple.Direction.REVERSE);
+        arms.setArmMotorsDirection(arm2Hardware.Side.Both, DcMotorSimple.Direction.FORWARD);
         servo.init(hardwareMap);
 
         servo.setPosition(0);

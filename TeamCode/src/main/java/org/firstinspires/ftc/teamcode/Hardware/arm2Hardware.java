@@ -26,11 +26,12 @@ public class arm2Hardware {
         // Set zero power behavior
         leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+linearSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Reset encoders
         leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         // Set motors to run without encoders
         leftArmMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

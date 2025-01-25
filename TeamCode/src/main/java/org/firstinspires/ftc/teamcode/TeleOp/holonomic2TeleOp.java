@@ -29,7 +29,7 @@ public class holonomic2TeleOp extends OpMode {
     // region Values
 
     double baseSpeed = 1; // This is the multiplier for the movement speed of the base
-    static final double maxArmRotation = -372; // Maximum allowed arm rotation
+    //static final double maxArmRotation = 342; // Maximum allowed arm rotation
     // endregion
 
     @Override
@@ -100,16 +100,26 @@ public class holonomic2TeleOp extends OpMode {
         // Arm Motors Movement with Rotation Limit
         double leftRotations = arms.getArmMotorsRotations(arm2Hardware.Side.Left);
         double rightRotations = arms.getArmMotorsRotations(arm2Hardware.Side.Right);
-
-       arms.setArmMotorsPower(arm2Hardware.Side.Right, 0.5);
-        arms.setArmMotorsPower(arm2Hardware.Side.Left, -0.5);
-
+if (gamepad2.right_trigger>0){
+    arms.setArmMotorsPower(arm2Hardware.Side.Right, gamepad2.right_trigger);
+    arms.setArmMotorsPower(arm2Hardware.Side.Left, -gamepad2.right_trigger);
+} else if (gamepad2.left_trigger>0) {
+    arms.setArmMotorsPower(arm2Hardware.Side.Right, -1);
+    arms.setArmMotorsPower(arm2Hardware.Side.Left, 1);
+}
+        arms.setArmMotorsPower(arm2Hardware.Side.Right, 0.2);
+        arms.setArmMotorsPower(arm2Hardware.Side.Left, -0.2);
+/*if (leftRotations<maxArmRotation){
+    arms.setArmMotorsPower(arm2Hardware.Side.Right, 0.2);
+    arms.setArmMotorsPower(arm2Hardware.Side.Left, -0.2);
+}
+ */
 
         // Claw Control
         if (gamepad2.x) {
             servo.setPosition(0); // Closed position
         } else {
-            servo.setPosition(0.7); // Open position
+            servo.setPosition(1); // Open position
         }
 
         // Debugging Telemetry
