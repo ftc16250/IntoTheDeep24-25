@@ -24,9 +24,9 @@ public class autoObs extends OpMode{
         drive.init(hardwareMap);
         drive.setMotorDirection(
                 DcMotorSimple.Direction.FORWARD,
-                DcMotorSimple.Direction.REVERSE,
                 DcMotorSimple.Direction.FORWARD,
-                DcMotorSimple.Direction.REVERSE
+                DcMotorSimple.Direction.FORWARD,
+                DcMotorSimple.Direction.FORWARD
         );
         arms.init(hardwareMap);
         arms.setLinearSlideMotorDirection(DcMotorSimple.Direction.REVERSE);
@@ -53,16 +53,28 @@ public class autoObs extends OpMode{
     }
     public void loop(){
         SparkFunOTOS.Pose2D pos = sparkfunOTOS.getPosition();
+
         telemetry.addData("X (inch)", pos.x);
         telemetry.addData("Y (inch)", pos.y);
         telemetry.addData("Heading (degrees)", pos.h);
 
-        drive.setMotorPower(1,1,1,1);
-        if (pos.y>= 48){
-            drive.setMotorPower(0,0,0,0);
-            arms.setArmMotorsPower(arm2Hardware.Side.Both, 1);
+        Step1();
+        if (pos.y >= 12){
+            Step2();
 
+        }
+        if (arms.getArmMotorsRotations(arm2Hardware.Side.Both)>= 1234 /* get real rotations*/){
+            servo.setPosition(1);
         }
 
     }
+
+    void Step2(){
+        drive.setMotorPower(0,0,0,0);
+        arms.setArmMotorsPower(arm2Hardware.Side.Both, 1);
+    }void Step1(){
+        drive.setMotorPower(1,1,1,1);
+
+    }
+
 }
