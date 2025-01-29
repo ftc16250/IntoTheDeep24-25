@@ -9,7 +9,7 @@ public class arm2Hardware {
     public DcMotor leftArmMotor = null;
     public DcMotor rightArmMotor = null;
     public DcMotor linearSlideMotor = null;
-
+    public static double fullRotationTicks = 751.8;
     public enum Side {
         Left,
         Right,
@@ -26,17 +26,20 @@ public class arm2Hardware {
         // Set zero power behavior
         leftArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightArmMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-linearSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        linearSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        // Reset encoders
-        leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        // Set motors to run without encoders
+        // Set motors to run using encoders
         leftArmMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightArmMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        linearSlideMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //leftArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //rightArmMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        linearSlideMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        // Reset encoders
+        //leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+       // rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //linearSlideMotor.setTargetPosition((int)fullRotationTicks);
     }
 
     // Set motor directions
@@ -61,6 +64,64 @@ linearSlideMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         if (side == arm2Hardware.Side.Right || side == arm2Hardware.Side.Both) {
             rightArmMotor.setPower(power);
         }
+    }
+
+    public void SetArmsMotorPosition(arm2Hardware.Side side, double rotations, double power){
+        double newTicks = fullRotationTicks*rotations;
+
+        if (side == arm2Hardware.Side.Left || side == arm2Hardware.Side.Both) {
+            leftArmMotor.setPower(power);
+            leftArmMotor.setTargetPosition((int)newTicks);
+            leftArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        }
+        if (side == arm2Hardware.Side.Right || side == arm2Hardware.Side.Both) {
+
+            rightArmMotor.setPower(power);
+            rightArmMotor.setTargetPosition((int)newTicks);
+            rightArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+    }
+
+    public void SetLinearMotorPosition(double rotations, double power){
+        double newTicks = fullRotationTicks*rotations;
+
+        linearSlideMotor.setPower(power);
+        linearSlideMotor.setTargetPosition((int)newTicks);
+        linearSlideMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void StopLinearSlide(){
+
+    }
+
+    public void ResetArmMotorPosition(arm2Hardware.Side side){
+        if (side == arm2Hardware.Side.Left || side == arm2Hardware.Side.Both) {
+            leftArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+        if (side == arm2Hardware.Side.Right || side == arm2Hardware.Side.Both) {
+            rightArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+    }
+    public void ResetLinearSlideMotorPosition(){
+        linearSlideMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+
+    public double getArmMotorPosition(arm2Hardware.Side side){
+        if (side == arm2Hardware.Side.Left) {
+            return  (leftArmMotor.getCurrentPosition()/fullRotationTicks);
+        }else if (side == arm2Hardware.Side.Right) {
+            return (double) (rightArmMotor.getCurrentPosition()/fullRotationTicks);
+        }else if (side == Side.Both){
+            double averagePos = (double)(Math.abs(leftArmMotor.getCurrentPosition()) + Math.abs(rightArmMotor.getCurrentPosition()))/2;
+            return (double)(averagePos/fullRotationTicks);
+        }else{
+            return 0;
+        }
+    }
+
+    public double getLinearSlidePosition(){
+        return (double)(linearSlideMotor.getCurrentPosition()/fullRotationTicks);
     }
 
     // Set power for linear slide motor

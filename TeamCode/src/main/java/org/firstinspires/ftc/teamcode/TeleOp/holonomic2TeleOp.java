@@ -29,6 +29,14 @@ public class holonomic2TeleOp extends OpMode {
     // region Values
 
     double baseSpeed = 1; // This is the multiplier for the movement speed of the base
+    double armSpeed = 0.01;
+    double linearSlideSpeed = 0.01;
+
+    double armMaxRotatation = 0.37;
+    double armMinRotatation = 0.1;
+    double linearSlideMaxRotation = 5;
+    double linearSlideMinRotation = 0.1;
+
     //static final double maxArmRotation = 342; // Maximum allowed arm rotation
     // endregion
 
@@ -47,7 +55,7 @@ public class holonomic2TeleOp extends OpMode {
         arms.init(hardwareMap);
         arms.setArmMotorsDirection(arm2Hardware.Side.Right, DcMotorSimple.Direction.FORWARD);
         arms.setArmMotorsDirection(arm2Hardware.Side.Left, DcMotorSimple.Direction.REVERSE);
-        arms.setLinearSlideMotorDirection(DcMotorSimple.Direction.FORWARD);
+        arms.setLinearSlideMotorDirection(DcMotorSimple.Direction.REVERSE);
 
         // Initialize servo hardware
         servo.init(hardwareMap);
@@ -89,47 +97,91 @@ public class holonomic2TeleOp extends OpMode {
         }
 
         // Linear Slide Arm Movement
-        if (gamepad2.left_stick_y > 0) {
-            arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
-        } else if (gamepad2.left_stick_y < 0) {
-            arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
+        double linearSlidePosition = arms.getLinearSlidePosition();
+        if (gamepad2.left_stick_y > 0 && linearSlidePosition < linearSlideMaxRotation) {
+            //arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
+            arms.SetLinearMotorPosition(linearSlideMaxRotation, -gamepad2.left_stick_y);
+
+        } else if (gamepad2.left_stick_y < 0 && linearSlidePosition > linearSlideMinRotation) {
+
+            arms.SetLinearMotorPosition(linearSlideMinRotation, -gamepad2.left_stick_y);
+
         } else {
-            arms.setLinearSlideMotorPower(0);
+            arms.SetLinearMotorPosition(linearSlidePosition, 1);
         }
 
-        // Arm Motors Movement with Rotation Limit
-        double leftRotations = arms.getArmMotorsRotations(arm2Hardware.Side.Left);
-        double rightRotations = arms.getArmMotorsRotations(arm2Hardware.Side.Right);
-if (gamepad2.right_trigger>0){
-    arms.setArmMotorsPower(arm2Hardware.Side.Right, gamepad2.right_trigger);
-    arms.setArmMotorsPower(arm2Hardware.Side.Left, -gamepad2.right_trigger);
-} else if (gamepad2.left_trigger>0) {
-    arms.setArmMotorsPower(arm2Hardware.Side.Right, -1);
-    arms.setArmMotorsPower(arm2Hardware.Side.Left, 1);
-}
+        if (gamepad2.right_trigger>0){
+            arms.setArmMotorsPower(arm2Hardware.Side.Right, gamepad2.right_trigger);
+            arms.setArmMotorsPower(arm2Hardware.Side.Left, -gamepad2.right_trigger);
+        } else if (gamepad2.left_trigger>0) {
+            arms.setArmMotorsPower(arm2Hardware.Side.Right, -1);
+            arms.setArmMotorsPower(arm2Hardware.Side.Left, 1);
+        }
         arms.setArmMotorsPower(arm2Hardware.Side.Right, 0.2);
         arms.setArmMotorsPower(arm2Hardware.Side.Left, -0.2);
+
+// region Encoder Arms
+        // Arm Motors Movement with Rotation Limit
+/*
+        double armPosition = arms.getArmMotorPosition(arm2Hardware.Side.Both);
+        boolean over = (armPosition > 0.4);
+if (gamepad2.right_trigger>0 && !over){
+arms.SetArmsMotorPosition(arm2Hardware.Side.Both, armMaxRotatation, gamepad2.right_trigger);
+}
+
+if (gamepad2.left_trigger>0 && armPosition > armMinRotatation) {
+arms.SetArmsMotorPosition(arm2Hardware.Side.Both, armMinRotatation, gamepad2.left_trigger);
+}
+
+if(over){
+    arms.SetArmsMotorPosition(arm2Hardware.Side.Both, armMinRotatation, gamepad2.left_trigger);
+}else if (gamepad2.right_trigger == 0 && gamepad2.left_trigger == 0)
+{
+    arms.SetArmsMotorPosition(arm2Hardware.Side.Both, armMaxRotatation, gamepad2.right_trigger);
+}
+/*
+if (gamepad2.left_trigger>0 && armPosition > armMinRotatation) {
+    arms.SetArmsMotorPosition(arm2Hardware.Side.Both, armMinRotatation, gamepad2.right_trigger);
+}
+
+if(gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0)
+{
+    arms.SetArmsMotorPosition(arm2Hardware.Side.Both, armMaxRotatation, gamepad2.right_trigger);
+}
+
+telemetry.addData("pos", armPosition);
+telemetry.addData("right trigger", gamepad2.right_trigger);
+telemetry.addData("left trigger", gamepad2.left_trigger);
+if(armPosition > 0){
+    //telemetry.addData("Over!", armPosition);
+   // arms.SetArmsMotorPosition(arm2Hardware.Side.Both, armPosition, 0);
+}
+*/
+
 /*if (leftRotations<maxArmRotation){
     arms.setArmMotorsPower(arm2Hardware.Side.Right, 0.2);
     arms.setArmMotorsPower(arm2Hardware.Side.Left, -0.2);
 }
  */
-
+// endregion
         // Claw Control
         if (gamepad2.x) {
-            servo.setPosition(0); // Closed position
+            servo.setPosition(0.3); // Closed position
         } else {
             servo.setPosition(1); // Open position
         }
 
+        if(gamepad2.b && gamepad2.a){
+            arms.ResetArmMotorPosition(arm2Hardware.Side.Both);
+            arms.ResetLinearSlideMotorPosition();
+        }
+
         // Debugging Telemetry
         telemetry.addData("Base Speed", baseSpeed);
-        telemetry.addData("Linear Slide Power", arms.getLinearSlideMotorPower());
-        telemetry.addData("Linear Slide Rotations", arms.getLinearSlideMotorRotations());
-        telemetry.addData("Left Arm Rotations", leftRotations);
-        telemetry.addData("Right Arm Power", arms.getArmMotorsPower(arm2Hardware.Side.Right));
-        telemetry.addData("Left Arm Power", arms.getArmMotorsPower(arm2Hardware.Side.Left));
-        telemetry.addData("Right Arm Rotations", rightRotations);
+        telemetry.addData("Arm Position Both", arms.getArmMotorPosition(arm2Hardware.Side.Both));
+        telemetry.addData("Arm Position Left", arms.getArmMotorPosition(arm2Hardware.Side.Left));
+        telemetry.addData("Arm Position Right", arms.getArmMotorPosition(arm2Hardware.Side.Right));
+        telemetry.addData("Linear Slide Position", arms.getLinearSlidePosition());
         telemetry.addData("Claw Position", servo.getPosition());
         telemetry.update();
     }
