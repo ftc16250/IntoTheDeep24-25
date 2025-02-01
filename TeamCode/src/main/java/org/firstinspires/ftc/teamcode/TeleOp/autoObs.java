@@ -24,6 +24,22 @@ public class autoObs extends OpMode{
         XH,
         YH
     }
+
+    enum Direction{
+        Left(-1),
+        Right(1),
+        Foward(1),
+        Backward(-1);
+
+        int value;
+        Direction(int v){
+            v = value;
+        }
+
+        public int getValue(){
+            return value;
+        }
+    }
     class Step {
         int id;
         boolean done;
@@ -56,20 +72,14 @@ public class autoObs extends OpMode{
     double h;
 
     int currentStepID;
-    Step Step1 = new Step(1, false, 0, 0, -90);
-    Step Step2 = new Step(1, false, 90, 0, -90);
-    Step[] AllSteps = {Step1, Step2};
+    Step Step1 = new Step(1, false, 0, 0, -90); // h
+    Step Step2 = new Step(1, false, 90, 0, -90); // x
+    Step Step3 = new Step(1, false, 0, 0, 0); // h
+    Step Step4 = new Step(1, false, 0, 24, 0); // y
+    Step Step5 = new Step(1, false, 0, 0, 180); // h
+    Step Step6 = new Step(1, false, 0, 0, 0); // y
+    Step[] AllSteps = {Step1, Step2, Step3, Step4, Step5, Step6};
 
-    boolean step1Done;
-    boolean step2Done;
-    boolean step3Done;
-    boolean step4Done;
-    boolean step5Done;
-    boolean step6Done;
-    boolean step7Done;
-    boolean step8Done;
-    boolean step9Done;
-    boolean step10Done;
 
     @Override
     public void init() {
@@ -117,7 +127,7 @@ public class autoObs extends OpMode{
 // region Run Steps
 
         if(!Step1.done){
-            Spin(-1);
+            Spin(Direction.Left, 1);
             if(pos.h <= Step1.targetH){
                 StopBase();
                 Step1.done = true;
@@ -126,24 +136,61 @@ public class autoObs extends OpMode{
             return;
         }
 
-        if(!step2Done){
-            MoveForwardBackward(1);
-            if(pos.x >= 3 ){
+        if(!Step2.done){
+            MoveForwardBackward(Direction.Foward,1);
+            if(pos.y >= Step2.targetY){
                 StopBase();
-                step2Done = true;
+                Step2.done = true;
                 return;
             }
             return;
         }
 
-        if(!step3Done){
-            Spin(1);
-            if(pos.h >= 0){
+        if(!Step3.done){
+            Spin(Direction.Right, 1);
+            if(pos.h >= Step3.targetH){
                 StopBase();
-                step3Done = true;
+                Step3.done = true;
                 return;
             }
         }
+
+        if(!Step3.done){
+            Spin(Direction.Right, 1);
+            if(pos.h >= Step3.targetH){
+                StopBase();
+                Step3.done = true;
+                return;
+            }
+        }
+
+        if(!Step4.done){
+            MoveForwardBackward(Direction.Foward, 1);
+            if(pos.y >= Step4.targetY){
+                StopBase();
+                Step4.done = true;
+                return;
+            }
+        }
+
+        if(!Step5.done){
+            Spin(Direction.Left, 1);
+            if(pos.h >= Step5.targetH){
+                StopBase();
+                Step5.done = true;
+                return;
+            }
+        }
+
+        if(!Step6.done){
+            MoveForwardBackward(Direction.Backward, 1);
+            if(pos.y <= Step6.targetY){
+                StopBase();
+                Step6.done = true;
+                return;
+            }
+        }
+
 // endregion
     }
 
@@ -158,18 +205,24 @@ public class autoObs extends OpMode{
 
 
 // region Base Movement
-    private void MoveForwardBackward(double forwardSpeed){ // Positive value Moves Foward, Negative value Moves Backwards
+    private void MoveForwardBackward(Direction direction, double forwardSpeed){ // Positive value Moves Foward, Negative value Moves Backwards
         forwardSpeed *= baseSpeed;
+        forwardSpeed = Math.abs(forwardSpeed);
+        forwardSpeed *= direction.getValue();
         MoveBase(-forwardSpeed, forwardSpeed, -forwardSpeed, forwardSpeed);
     }
 
-    private void Strafe(double strafeSpeed){ // Negative value Strafes Left, Positive value Strafes Right
+    private void Strafe(Direction direction, double strafeSpeed){ // Negative value Strafes Left, Positive value Strafes Right
         strafeSpeed *= baseSpeed;
+        strafeSpeed = Math.abs(strafeSpeed);
+        strafeSpeed *= direction.getValue();
         MoveBase(strafeSpeed, -strafeSpeed, -strafeSpeed, strafeSpeed);
     }
 
-    private void Spin(double spinSpeed){// Positive value Spins Right, Negative value Spins Left
+    private void Spin(Direction direction, double spinSpeed){// Positive value Spins Right, Negative value Spins Left
         spinSpeed *= baseSpeed;
+        spinSpeed = Math.abs(spinSpeed);
+        spinSpeed *= direction.getValue();
         MoveBase(-spinSpeed, -spinSpeed, -spinSpeed, -spinSpeed);
     }
 
