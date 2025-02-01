@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 
-import android.renderscript.Script;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -15,50 +13,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous
-public class autoObs extends OpMode{
-    enum MovementType{
-        X,
-        Y,
-        H,
-        XY,
-        XH,
-        YH
-    }
-    class Step {
-        int id;
-        boolean done;
-        double targetX;
-        double targetY;
-        double targetH;
-        //MovementType moveTpye;
-
-        public Step(int id, boolean done, double targetX, double targetY, double targetH) {
-            this.id = id;
-            this.done = done;
-            this.targetX = targetX;
-            this.targetY = targetY;
-            this.targetH = targetH;
-            //this.moveTpye = movementType;
-        }
-
-
-    }
-
+public class OdometrySensorRead extends OpMode{
     holonomicHardware drive = new holonomicHardware();
     arm2Hardware arms = new arm2Hardware();
     servoHardware2 servo = new servoHardware2();
     SparkFunOTOS sparkfunOTOS;
 
-    double baseSpeed = 0.3;
-
     double x;
     double y;
     double h;
 
-    int currentStepID;
-    Step Step1 = new Step(1, false, 0, 0, -90);
-    Step Step2 = new Step(1, false, 90, 0, -90);
-    Step[] AllSteps = {Step1, Step2};
+    double baseSpeed = 0.3;
 
     boolean step1Done;
     boolean step2Done;
@@ -88,6 +53,7 @@ public class autoObs extends OpMode{
         servo.setPosition(0);
         sparkfunOTOS = hardwareMap.get(SparkFunOTOS.class, "otos");
         configureOTOS();
+
     }
     private void configureOTOS() {
         sparkfunOTOS.setLinearUnit(DistanceUnit.INCH);
@@ -103,9 +69,8 @@ public class autoObs extends OpMode{
         telemetry.addData("Samples left to calibrate", sparkfunOTOS.getImuCalibrationProgress());
     }
 
-    public void loop(){
+    public void loop() {
         SparkFunOTOS.Pose2D pos = sparkfunOTOS.getPosition();
-
         x = -pos.y;
         y = pos.x;
         h = -pos.h;
@@ -113,73 +78,6 @@ public class autoObs extends OpMode{
         telemetry.addData("X (inch)", x);
         telemetry.addData("Y (inch)", y);
         telemetry.addData("Heading (degrees)", h);
-
-// region Run Steps
-
-        if(!Step1.done){
-            Spin(-1);
-            if(pos.h <= Step1.targetH){
-                StopBase();
-                Step1.done = true;
-                return;
-            }
-            return;
-        }
-
-        if(!step2Done){
-            MoveForwardBackward(1);
-            if(pos.x >= 3 ){
-                StopBase();
-                step2Done = true;
-                return;
-            }
-            return;
-        }
-
-        if(!step3Done){
-            Spin(1);
-            if(pos.h >= 0){
-                StopBase();
-                step3Done = true;
-                return;
-            }
-        }
-// endregion
     }
 
-// region Steps
-    void Step1(){
-
-    }
-
-
-// endregion
-
-
-
-// region Base Movement
-    private void MoveForwardBackward(double forwardSpeed){ // Positive value Moves Foward, Negative value Moves Backwards
-        forwardSpeed *= baseSpeed;
-        MoveBase(-forwardSpeed, forwardSpeed, -forwardSpeed, forwardSpeed);
-    }
-
-    private void Strafe(double strafeSpeed){ // Negative value Strafes Left, Positive value Strafes Right
-        strafeSpeed *= baseSpeed;
-        MoveBase(strafeSpeed, -strafeSpeed, -strafeSpeed, strafeSpeed);
-    }
-
-    private void Spin(double spinSpeed){// Positive value Spins Right, Negative value Spins Left
-        spinSpeed *= baseSpeed;
-        MoveBase(-spinSpeed, -spinSpeed, -spinSpeed, -spinSpeed);
-    }
-
-    private void StopBase(){
-        MoveBase(0, 0, 0, 0);
-    }
-
-    // Backend
-    protected void MoveBase(double fl, double fr, double bl, double br) {
-        drive.setMotorPower(fl, fr, bl, br);
-    }
-    // endregion
 }

@@ -83,8 +83,8 @@ public class holonomic2TeleOp extends OpMode {
 
         // Base Movement
         double forwardSpeed = gamepad1.left_stick_y;
-        double strafeSpeed = gamepad1.right_stick_x;
-        double spinSpeed = gamepad1.left_stick_x;
+        double strafeSpeed = gamepad1.left_stick_x;
+        double spinSpeed = gamepad1.right_stick_x;
 
         if (forwardSpeed != 0) {
             MoveBase(forwardSpeed, -forwardSpeed, forwardSpeed, -forwardSpeed);
@@ -101,12 +101,13 @@ public class holonomic2TeleOp extends OpMode {
         if (gamepad2.left_stick_y > 0 && linearSlidePosition < linearSlideMaxRotation) {
             //arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
             arms.SetLinearMotorPosition(linearSlideMaxRotation, -gamepad2.left_stick_y);
-
-        } else if (gamepad2.left_stick_y < 0 && linearSlidePosition > linearSlideMinRotation) {
+        }else
+        if (gamepad2.left_stick_y < 0 && linearSlidePosition > linearSlideMinRotation) {
 
             arms.SetLinearMotorPosition(linearSlideMinRotation, -gamepad2.left_stick_y);
 
-        } else {
+        }else
+        {
             arms.SetLinearMotorPosition(linearSlidePosition, 1);
         }
 
@@ -166,7 +167,7 @@ if(armPosition > 0){
 // endregion
         // Claw Control
         if (gamepad2.x) {
-            servo.setPosition(0.3); // Closed position
+            servo.setPosition(0.2); // Closed position
         } else {
             servo.setPosition(1); // Open position
         }
