@@ -115,11 +115,12 @@ public class holonomic2TeleOp extends OpMode {
             arms.setArmMotorsPower(arm2Hardware.Side.Right, gamepad2.right_trigger);
             arms.setArmMotorsPower(arm2Hardware.Side.Left, -gamepad2.right_trigger);
         } else if (gamepad2.left_trigger>0) {
-            arms.setArmMotorsPower(arm2Hardware.Side.Right, -1);
-            arms.setArmMotorsPower(arm2Hardware.Side.Left, 1);
+            arms.setArmMotorsPower(arm2Hardware.Side.Right, -gamepad2.left_trigger);
+            arms.setArmMotorsPower(arm2Hardware.Side.Left, gamepad2.left_trigger);
+        }else {
+            arms.setArmMotorsPower(arm2Hardware.Side.Right, 0.2);
+            arms.setArmMotorsPower(arm2Hardware.Side.Left, -0.2);
         }
-        arms.setArmMotorsPower(arm2Hardware.Side.Right, 0.2);
-        arms.setArmMotorsPower(arm2Hardware.Side.Left, -0.2);
 
 // region Encoder Arms
         // Arm Motors Movement with Rotation Limit

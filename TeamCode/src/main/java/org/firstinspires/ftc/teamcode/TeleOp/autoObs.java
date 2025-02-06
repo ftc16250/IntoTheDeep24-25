@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Hardware.arm2Hardware;
 import org.firstinspires.ftc.teamcode.Hardware.servoHardware2;
 import org.firstinspires.ftc.teamcode.Hardware.holonomicHardware;
@@ -26,23 +27,14 @@ public class autoObs extends OpMode{
     }
 
     enum Direction{
-        Left(-1),
-        Right(1),
-        Foward(1),
-        Backward(-1);
-
-        int value;
-        Direction(int v){
-            v = value;
-        }
-
-        public int getValue(){
-            return value;
-        }
+        Left,
+        Right,
+        Foward,
+        Backward
     }
     class Step {
         int id;
-        boolean done;
+        boolean done = false;
         double targetX;
         double targetY;
         double targetH;
@@ -73,11 +65,11 @@ public class autoObs extends OpMode{
 
     int currentStepID;
     Step Step1 = new Step(1, false, 0, 0, -90); // h
-    Step Step2 = new Step(1, false, 90, 0, -90); // x
-    Step Step3 = new Step(1, false, 0, 0, 0); // h
-    Step Step4 = new Step(1, false, 0, 24, 0); // y
-    Step Step5 = new Step(1, false, 0, 0, 180); // h
-    Step Step6 = new Step(1, false, 0, 0, 0); // y
+    Step Step2 = new Step(2, false, 0, 12, -90); // y
+    Step Step3 = new Step(3, false, 0, 0, 0); // h
+    Step Step4 = new Step(4, false, 0, 24, 0); // y
+    Step Step5 = new Step(5, false, 0, 0, 180); // h
+    Step Step6 = new Step(6, false, 0, 0, 0); // y
     Step[] AllSteps = {Step1, Step2, Step3, Step4, Step5, Step6};
 
 
@@ -127,30 +119,40 @@ public class autoObs extends OpMode{
 // region Run Steps
 
         if(!Step1.done){
+            telemetry.addLine("Step1 Started");
             Spin(Direction.Left, 1);
+            telemetry.addData("should be ", "moving");
             if(pos.h <= Step1.targetH){
+                telemetry.addData("should", "stop");
                 StopBase();
                 Step1.done = true;
+                telemetry.addLine("Step1 ended");
                 return;
             }
             return;
         }
 
         if(!Step2.done){
+            telemetry.addLine("Step2 Started");
+
             MoveForwardBackward(Direction.Foward,1);
             if(pos.y >= Step2.targetY){
                 StopBase();
                 Step2.done = true;
+                telemetry.addLine("Step2 Done");
                 return;
             }
             return;
         }
 
         if(!Step3.done){
+            telemetry.addLine("Step3 Started");
+
             Spin(Direction.Right, 1);
             if(pos.h >= Step3.targetH){
                 StopBase();
                 Step3.done = true;
+                telemetry.addLine("Step3 Done");
                 return;
             }
         }
@@ -208,21 +210,30 @@ public class autoObs extends OpMode{
     private void MoveForwardBackward(Direction direction, double forwardSpeed){ // Positive value Moves Foward, Negative value Moves Backwards
         forwardSpeed *= baseSpeed;
         forwardSpeed = Math.abs(forwardSpeed);
-        forwardSpeed *= direction.getValue();
+        if(direction == Direction.Backward) {
+        forwardSpeed *= -1;
+        }
         MoveBase(-forwardSpeed, forwardSpeed, -forwardSpeed, forwardSpeed);
     }
 
     private void Strafe(Direction direction, double strafeSpeed){ // Negative value Strafes Left, Positive value Strafes Right
         strafeSpeed *= baseSpeed;
         strafeSpeed = Math.abs(strafeSpeed);
-        strafeSpeed *= direction.getValue();
+        if(direction == Direction.Left){
+            strafeSpeed *= -1;
+        }
         MoveBase(strafeSpeed, -strafeSpeed, -strafeSpeed, strafeSpeed);
     }
 
     private void Spin(Direction direction, double spinSpeed){// Positive value Spins Right, Negative value Spins Left
         spinSpeed *= baseSpeed;
         spinSpeed = Math.abs(spinSpeed);
-        spinSpeed *= direction.getValue();
+        telemetry.addData("spinSpeed", spinSpeed);
+        if(direction == Direction.Left){
+            spinSpeed *=-1;
+        }
+        telemetry.addData("newSpinSpeed", spinSpeed);
+        telemetry.addData("direction", direction);
         MoveBase(-spinSpeed, -spinSpeed, -spinSpeed, -spinSpeed);
     }
 
