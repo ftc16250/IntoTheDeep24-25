@@ -64,12 +64,18 @@ public class autoObs extends OpMode{
     double h;
 
     int currentStepID;
-    Step Step1 = new Step(1, false, 0, 0, -90); // h
-    Step Step2 = new Step(2, false, 0, 12, -90); // y
-    Step Step3 = new Step(3, false, 0, 0, 0); // h
-    Step Step4 = new Step(4, false, 0, 24, 0); // y
-    Step Step5 = new Step(5, false, 0, 0, 180); // h
-    Step Step6 = new Step(6, false, 0, 0, 0); // y
+    Step Step1 = new Step(1, false, -10, 0, 0); // x
+    Step Step2 = new Step(2, false, -10, 12, 0); // y
+    Step Step3 = new Step(3, false, 0, 12, 0); // x
+    Step Step4 = new Step(4, false, 0, 2, 0); // y
+    Step Step5 = new Step(5, false, -10, 2, 0); // x
+    Step Step6 = new Step(6, false, -10, 12, 0); // y
+    Step Step7 = new Step(6, false, 5, 12, 0); // x
+    Step Step8 = new Step(6, false, 0, 2, 0); // y
+    Step Step9 = new Step(6, false, -10, 2, 0); // x
+    Step Step10 = new Step(6, false, -10, 12, 0); // y
+    Step Step11 = new Step(6, false, 10, 12, 0); // x
+    Step Step12 = new Step(6, false, 10, 2, 0); // y
     Step[] AllSteps = {Step1, Step2, Step3, Step4, Step5, Step6};
 
 
@@ -120,9 +126,9 @@ public class autoObs extends OpMode{
 
         if(!Step1.done){
             telemetry.addLine("Step1 Started");
-            Spin(Direction.Left, 1);
+            Strafe(Direction.Left, 1);
             telemetry.addData("should be ", "moving");
-            if(pos.h <= Step1.targetH){
+            if(x <= Step1.targetX){
                 telemetry.addData("should", "stop");
                 StopBase();
                 Step1.done = true;
@@ -136,7 +142,7 @@ public class autoObs extends OpMode{
             telemetry.addLine("Step2 Started");
 
             MoveForwardBackward(Direction.Foward,1);
-            if(pos.y >= Step2.targetY){
+            if(y >= Step2.targetY){
                 StopBase();
                 Step2.done = true;
                 telemetry.addLine("Step2 Done");
@@ -148,51 +154,132 @@ public class autoObs extends OpMode{
         if(!Step3.done){
             telemetry.addLine("Step3 Started");
 
-            Spin(Direction.Right, 1);
-            if(pos.h >= Step3.targetH){
+            Strafe(Direction.Right,1);
+            if(x >= Step3.targetX){
                 StopBase();
                 Step3.done = true;
                 telemetry.addLine("Step3 Done");
                 return;
             }
-        }
-
-        if(!Step3.done){
-            Spin(Direction.Right, 1);
-            if(pos.h >= Step3.targetH){
-                StopBase();
-                Step3.done = true;
-                return;
-            }
+            return;
         }
 
         if(!Step4.done){
-            MoveForwardBackward(Direction.Foward, 1);
-            if(pos.y >= Step4.targetY){
+            telemetry.addLine("Step4 Started");
+
+            MoveForwardBackward(Direction.Backward,1);
+            if(y <= Step4.targetY){
                 StopBase();
                 Step4.done = true;
+                telemetry.addLine("Step4 Done");
                 return;
             }
+            return;
         }
 
         if(!Step5.done){
-            Spin(Direction.Left, 1);
-            if(pos.h >= Step5.targetH){
+            telemetry.addLine("Step5 Started");
+
+            Strafe(Direction.Left,1);
+            if(x <= Step5.targetX){
                 StopBase();
                 Step5.done = true;
+                telemetry.addLine("Step5 Done");
                 return;
             }
+            return;
         }
 
         if(!Step6.done){
-            MoveForwardBackward(Direction.Backward, 1);
-            if(pos.y <= Step6.targetY){
+            telemetry.addLine("Step6 Started");
+
+            MoveForwardBackward(Direction.Foward,1);
+            if(y >= Step6.targetY){
                 StopBase();
                 Step6.done = true;
+                telemetry.addLine("Step6 Done");
                 return;
             }
+            return;
         }
 
+        if(!Step7.done){
+            telemetry.addLine("Step7 Started");
+
+            Strafe(Direction.Right,1);
+            if(x >= Step7.targetX){
+                StopBase();
+                Step7.done = true;
+                telemetry.addLine("Step7 Done");
+                return;
+            }
+            return;
+        }
+
+        if(!Step8.done){
+            telemetry.addLine("Step8 Started");
+
+            MoveForwardBackward(Direction.Backward,1);
+            if(y <= Step8.targetY){
+                StopBase();
+                Step8.done = true;
+                telemetry.addLine("Step8 Done");
+                return;
+            }
+            return;
+        }
+
+        if(!Step9.done){
+            telemetry.addLine("Step9 Started");
+
+            Strafe(Direction.Left,1);
+            if(x <= Step9.targetX){
+                StopBase();
+                Step9.done = true;
+                telemetry.addLine("Step9 Done");
+                return;
+            }
+            return;
+        }
+
+        if(!Step10.done){
+            telemetry.addLine("Step10 Started");
+
+            MoveForwardBackward(Direction.Foward,1);
+            if(y >= Step10.targetY){
+                StopBase();
+                Step10.done = true;
+                telemetry.addLine("Step10 Done");
+                return;
+            }
+            return;
+        }
+
+        if(!Step11.done){
+            telemetry.addLine("Step11 Started");
+
+            Strafe(Direction.Right,1);
+            if(x >= Step11.targetX){
+                StopBase();
+                Step11.done = true;
+                telemetry.addLine("Step11 Done");
+                return;
+            }
+            return;
+        }
+
+        if(!Step12.done){
+            telemetry.addLine("Step12 Started");
+
+            MoveForwardBackward(Direction.Backward,1);
+            if(y <= Step12.targetY){
+                StopBase();
+                Step12.done = true;
+                telemetry.addLine("Step12 Done");
+                return;
+            }
+            return;
+        }
 // endregion
     }
 

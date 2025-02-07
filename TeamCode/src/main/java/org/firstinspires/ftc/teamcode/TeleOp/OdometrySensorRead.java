@@ -78,6 +78,10 @@ public class OdometrySensorRead extends OpMode{
         telemetry.addData("X (inch)", x);
         telemetry.addData("Y (inch)", y);
         telemetry.addData("Heading (degrees)", h);
+
+        if(h == 90){
+
+        }
     }
 
 }

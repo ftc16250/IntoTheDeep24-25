@@ -35,7 +35,9 @@ public class holonomic2TeleOp extends OpMode {
     double armMaxRotatation = 0.37;
     double armMinRotatation = 0.1;
     double linearSlideMaxRotation = 5;
+    double linearSlideFullMaxRotation = 6.5;
     double linearSlideMinRotation = 0.1;
+    double linearSlideFullMinRotation = -10;
 
     //static final double maxArmRotation = 342; // Maximum allowed arm rotation
     // endregion
@@ -75,22 +77,28 @@ public class holonomic2TeleOp extends OpMode {
     @Override
     public void loop() {
         // Base Speed Adjustment
-        if (Input.BaseBrakes > 0) {
-            baseSpeed = 1 - gamepad1.left_trigger;
-        } else {
-            baseSpeed = 1;
+        if(gamepad1.a){
+            baseSpeed=1;
+        }else if(gamepad1.b){
+
+        }else {
+            baseSpeed = 0.6;
         }
 
         // Base Movement
         double forwardSpeed = gamepad1.left_stick_y;
-        double strafeSpeed = gamepad1.left_stick_x;
+        double strafeSpeedRight = gamepad1.right_trigger;
+        double strafeSpeedLeft = -gamepad1.left_trigger;
         double spinSpeed = gamepad1.right_stick_x;
 
         if (forwardSpeed != 0) {
             MoveBase(forwardSpeed, -forwardSpeed, forwardSpeed, -forwardSpeed);
-        } else if (strafeSpeed != 0) {
-            MoveBase(strafeSpeed, -strafeSpeed, -strafeSpeed, strafeSpeed);
-        } else if (spinSpeed != 0) {
+        } else if (strafeSpeedRight != 0) {
+            MoveBase(strafeSpeedRight, -strafeSpeedRight, -strafeSpeedRight, strafeSpeedRight);
+        }else if (strafeSpeedLeft != 0) {
+            MoveBase(strafeSpeedLeft, -strafeSpeedLeft, -strafeSpeedLeft, strafeSpeedLeft);
+        }
+        else if (spinSpeed != 0) {
             MoveBase(-spinSpeed, -spinSpeed, -spinSpeed, -spinSpeed);
         } else {
             MoveBase(0, 0, 0, 0);
@@ -98,13 +106,19 @@ public class holonomic2TeleOp extends OpMode {
 
         // Linear Slide Arm Movement
         double linearSlidePosition = arms.getLinearSlidePosition();
-        if (gamepad2.left_stick_y > 0 && linearSlidePosition < linearSlideMaxRotation) {
+        double linearSlideNewMax = linearSlideMaxRotation;
+        double linearSlideNewMin = linearSlideMinRotation;
+        if(gamepad2.a){
+            linearSlideNewMax = linearSlideFullMaxRotation;
+            linearSlideNewMin = linearSlideFullMinRotation;
+        }
+        if (gamepad2.left_stick_y > 0 && linearSlidePosition < linearSlideNewMax) {
             //arms.setLinearSlideMotorPower(gamepad2.left_stick_y);
-            arms.SetLinearMotorPosition(linearSlideMaxRotation, -gamepad2.left_stick_y);
+          arms.SetLinearMotorPosition(linearSlideNewMax, -gamepad2.left_stick_y);
         }else
-        if (gamepad2.left_stick_y < 0 && linearSlidePosition > linearSlideMinRotation) {
+        if (gamepad2.left_stick_y < 0 && linearSlidePosition > linearSlideNewMin) {
 
-            arms.SetLinearMotorPosition(linearSlideMinRotation, -gamepad2.left_stick_y);
+            arms.SetLinearMotorPosition(linearSlideNewMin, -gamepad2.left_stick_y);
 
         }else
         {
@@ -170,11 +184,11 @@ if(armPosition > 0){
         if (gamepad2.x) {
             servo.setPosition(0.2); // Closed position
         } else {
-            servo.setPosition(1); // Open position
+            servo.setPosition(0.7); // Open position
         }
 
-        if(gamepad2.b && gamepad2.a){
-            arms.ResetArmMotorPosition(arm2Hardware.Side.Both);
+        if(gamepad2.left_bumper && gamepad2.right_bumper){
+            //arms.ResetArmMotorPosition(arm2Hardware.Side.Both);
             arms.ResetLinearSlideMotorPosition();
         }
 
