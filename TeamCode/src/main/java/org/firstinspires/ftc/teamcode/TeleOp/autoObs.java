@@ -64,18 +64,17 @@ public class autoObs extends OpMode{
     double h;
 
     int currentStepID;
-    Step Step1 = new Step(1, false, -10, 0, 0); // x
-    Step Step2 = new Step(2, false, -10, 12, 0); // y
-    Step Step3 = new Step(3, false, 0, 12, 0); // x
-    Step Step4 = new Step(4, false, 0, 2, 0); // y
-    Step Step5 = new Step(5, false, -10, 2, 0); // x
-    Step Step6 = new Step(6, false, -10, 12, 0); // y
-    Step Step7 = new Step(6, false, 5, 12, 0); // x
-    Step Step8 = new Step(6, false, 0, 2, 0); // y
-    Step Step9 = new Step(6, false, -10, 2, 0); // x
-    Step Step10 = new Step(6, false, -10, 12, 0); // y
-    Step Step11 = new Step(6, false, 10, 12, 0); // x
-    Step Step12 = new Step(6, false, 10, 2, 0); // y
+    Step Step1 = new Step(1, false, 36, 0, 0); // x
+    Step Step2 = new Step(2, false, 24, 0, 0); // x
+    Step Step3 = new Step(3, false, 0, 36, 0); // y
+    Step Step4 = new Step(3, false, 36, 0, 0); // x
+    Step Step5 = new Step(4, false, 0, 12, 0); // y
+    Step Step6 = new Step(5, false, 0, 36, 0); // y
+    Step Step7 = new Step(6, false, 48, 0, 0); // x
+    Step Step8 = new Step(6, false, 0, 12, 0); // y
+    Step Step9 = new Step(6, false, 0, 36, 0); // y
+    Step Step10 = new Step(6, false, 60, 0, 0); // x
+    Step Step11 = new Step(6, false, 0, 4, 0); // y
     Step[] AllSteps = {Step1, Step2, Step3, Step4, Step5, Step6};
 
 
@@ -96,6 +95,7 @@ public class autoObs extends OpMode{
         servo.setPosition(0);
         sparkfunOTOS = hardwareMap.get(SparkFunOTOS.class, "otos");
         configureOTOS();
+        telemetry.addAction(this::configureOTOS);
     }
     private void configureOTOS() {
         sparkfunOTOS.setLinearUnit(DistanceUnit.INCH);
@@ -128,7 +128,7 @@ public class autoObs extends OpMode{
             telemetry.addLine("Step1 Started");
             Strafe(Direction.Left, 1);
             telemetry.addData("should be ", "moving");
-            if(x <= Step1.targetX){
+            if(x >= Step1.targetX){
                 telemetry.addData("should", "stop");
                 StopBase();
                 Step1.done = true;
@@ -141,8 +141,8 @@ public class autoObs extends OpMode{
         if(!Step2.done){
             telemetry.addLine("Step2 Started");
 
-            MoveForwardBackward(Direction.Foward,1);
-            if(y >= Step2.targetY){
+            Strafe(Direction.Right,1);
+            if(x <= Step2.targetX){
                 StopBase();
                 Step2.done = true;
                 telemetry.addLine("Step2 Done");
@@ -154,8 +154,8 @@ public class autoObs extends OpMode{
         if(!Step3.done){
             telemetry.addLine("Step3 Started");
 
-            Strafe(Direction.Right,1);
-            if(x >= Step3.targetX){
+            MoveForwardBackward(Direction.Foward,1);
+            if(y >= Step3.targetY){
                 StopBase();
                 Step3.done = true;
                 telemetry.addLine("Step3 Done");
@@ -167,8 +167,8 @@ public class autoObs extends OpMode{
         if(!Step4.done){
             telemetry.addLine("Step4 Started");
 
-            MoveForwardBackward(Direction.Backward,1);
-            if(y <= Step4.targetY){
+            Strafe(Direction.Left,1);
+            if(x >= Step4.targetX){
                 StopBase();
                 Step4.done = true;
                 telemetry.addLine("Step4 Done");
@@ -180,8 +180,8 @@ public class autoObs extends OpMode{
         if(!Step5.done){
             telemetry.addLine("Step5 Started");
 
-            Strafe(Direction.Left,1);
-            if(x <= Step5.targetX){
+            MoveForwardBackward(Direction.Backward,1);
+            if(x <= Step5.targetY){
                 StopBase();
                 Step5.done = true;
                 telemetry.addLine("Step5 Done");
@@ -206,7 +206,7 @@ public class autoObs extends OpMode{
         if(!Step7.done){
             telemetry.addLine("Step7 Started");
 
-            Strafe(Direction.Right,1);
+            Strafe(Direction.Left,1);
             if(x >= Step7.targetX){
                 StopBase();
                 Step7.done = true;
@@ -232,8 +232,8 @@ public class autoObs extends OpMode{
         if(!Step9.done){
             telemetry.addLine("Step9 Started");
 
-            Strafe(Direction.Left,1);
-            if(x <= Step9.targetX){
+            MoveForwardBackward(Direction.Foward,1);
+            if(y >= Step9.targetY){
                 StopBase();
                 Step9.done = true;
                 telemetry.addLine("Step9 Done");
@@ -245,8 +245,8 @@ public class autoObs extends OpMode{
         if(!Step10.done){
             telemetry.addLine("Step10 Started");
 
-            MoveForwardBackward(Direction.Foward,1);
-            if(y >= Step10.targetY){
+            Strafe(Direction.Left,1);
+            if(x >= Step10.targetX){
                 StopBase();
                 Step10.done = true;
                 telemetry.addLine("Step10 Done");
@@ -265,21 +265,8 @@ public class autoObs extends OpMode{
                 telemetry.addLine("Step11 Done");
                 return;
             }
-            return;
         }
-
-        if(!Step12.done){
-            telemetry.addLine("Step12 Started");
-
-            MoveForwardBackward(Direction.Backward,1);
-            if(y <= Step12.targetY){
-                StopBase();
-                Step12.done = true;
-                telemetry.addLine("Step12 Done");
-                return;
-            }
-            return;
-        }
+        telemetry.addLine("Auto Done");
 // endregion
     }
 
